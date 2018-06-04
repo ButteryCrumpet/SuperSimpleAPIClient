@@ -97,7 +97,14 @@ class Endpoint
         $params = empty($params) ? $this->params : array_merge($this->params, $params);
         $uri = empty($params) ? $this->uri : $this->uri . "?" . http_build_query($params);
 
-        $request = $this->requestFactory->build("GET", $uri);
+        if (isset($params["uriParams"])) {
+            foreach ($params["uriParams"] as $key => $param) {
+                $uri = \str_replace("{" . $key . "}", $param, $uri);
+            }
+            unset($params["uriParams"]);
+        }
+
+        $request = $this->requestFactory->build($method, $uri);
         if ($body !== null) {
             $request = $request->withBody($body);
         }
